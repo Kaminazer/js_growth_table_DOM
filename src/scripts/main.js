@@ -11,41 +11,81 @@ const removeColumnBtn = document.querySelector('.remove-column');
 
 updateBtnStates();
 
+// Helper functions для перевірок
+function canAddRow() {
+  return getCountRows() < MAX_COUNT;
+}
+
+function canRemoveRow() {
+  return getCountRows() > MIN_COUNT;
+}
+
+function canAddColumn() {
+  return getCountColumns() < MAX_COUNT;
+}
+
+function canRemoveColumn() {
+  return getCountColumns() > MIN_COUNT;
+}
+
+// Helper для створення комірок
+function createCell() {
+  return document.createElement('td');
+}
+
 addRowBtn.addEventListener('click', () => {
-  const newRow = tBody.querySelector('tr').cloneNode(true);
+  if (!canAddRow()) {
+    return;
+  }
+
+  const newRow = document.createElement('tr');
+  const currentColumns = getCountColumns();
+
+  for (let i = 0; i < currentColumns; i++) {
+    newRow.appendChild(createCell());
+  }
 
   tBody.appendChild(newRow);
   updateBtnStates();
 });
 
 removeRowBtn.addEventListener('click', () => {
+  if (!canRemoveRow()) {
+    return;
+  }
+
   const lastRow = tBody.querySelector('tr:last-child');
 
-  lastRow.remove();
-  updateBtnStates();
+  if (lastRow) {
+    lastRow.remove();
+    updateBtnStates();
+  }
 });
 
 addColumnBtn.addEventListener('click', () => {
-  const rows = tBody.querySelectorAll('tr');
+  if (!canAddColumn()) {
+    return;
+  }
 
-  rows.forEach((row) => {
-    const newCell = document.createElement('td');
-
-    row.appendChild(newCell);
+  tBody.querySelectorAll('tr').forEach((row) => {
+    row.appendChild(createCell());
   });
   updateBtnStates();
 });
 
 removeColumnBtn.addEventListener('click', () => {
-  const rows = tBody.querySelectorAll('tr');
+  if (!canRemoveColumn()) {
+    return;
+  }
 
-  rows.forEach((row) => {
+  tBody.querySelectorAll('tr').forEach((row) => {
     const lastCell = row.querySelector('td:last-child');
 
     if (lastCell) {
       lastCell.remove();
     }
   });
+
   updateBtnStates();
 });
 
@@ -61,27 +101,9 @@ function updateBtnStates() {
   const currentRows = getCountRows();
   const currentColumns = getCountColumns();
 
-  if (currentRows <= MIN_COUNT) {
-    removeRowBtn.disabled = true;
-  } else {
-    removeRowBtn.disabled = false;
-  }
+  removeRowBtn.disabled = currentRows <= MIN_COUNT;
+  addRowBtn.disabled = currentRows >= MAX_COUNT;
 
-  if (currentRows >= MAX_COUNT) {
-    addRowBtn.disabled = true;
-  } else {
-    addRowBtn.disabled = false;
-  }
-
-  if (currentColumns <= MIN_COUNT) {
-    removeColumnBtn.disabled = true;
-  } else {
-    removeColumnBtn.disabled = false;
-  }
-
-  if (currentColumns >= MAX_COUNT) {
-    addColumnBtn.disabled = true;
-  } else {
-    addColumnBtn.disabled = false;
-  }
+  removeColumnBtn.disabled = currentColumns <= MIN_COUNT;
+  addColumnBtn.disabled = currentColumns >= MAX_COUNT;
 }
