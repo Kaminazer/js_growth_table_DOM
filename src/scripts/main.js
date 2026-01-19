@@ -4,10 +4,6 @@ const MAX_COUNT = 10;
 const MIN_COUNT = 2;
 
 const tBody = document.querySelector('.field tbody');
-
-let currentRows = tBody.querySelectorAll('tr').length;
-let currentColumns = tBody.querySelector('tr').cells.length;
-
 const addRowBtn = document.querySelector('.append-row');
 const addColumnBtn = document.querySelector('.append-column');
 const removeRowBtn = document.querySelector('.remove-row');
@@ -19,7 +15,6 @@ addRowBtn.addEventListener('click', () => {
   const newRow = tBody.querySelector('tr').cloneNode(true);
 
   tBody.appendChild(newRow);
-  currentRows++;
   updateBtnStates();
 });
 
@@ -27,7 +22,6 @@ removeRowBtn.addEventListener('click', () => {
   const lastRow = tBody.querySelector('tr:last-child');
 
   lastRow.remove();
-  currentRows--;
   updateBtnStates();
 });
 
@@ -39,7 +33,6 @@ addColumnBtn.addEventListener('click', () => {
 
     row.appendChild(newCell);
   });
-  currentColumns++;
   updateBtnStates();
 });
 
@@ -47,15 +40,27 @@ removeColumnBtn.addEventListener('click', () => {
   const rows = tBody.querySelectorAll('tr');
 
   rows.forEach((row) => {
-    const lastCelll = row.querySelector('td:last-child');
+    const lastCell = row.querySelector('td:last-child');
 
-    lastCelll.remove();
+    if (lastCell) {
+      lastCell.remove();
+    }
   });
-  currentColumns--;
   updateBtnStates();
 });
 
+function getCountRows() {
+  return tBody.querySelectorAll('tr').length;
+}
+
+function getCountColumns() {
+  return tBody.rows[0]?.cells.length || 0;
+}
+
 function updateBtnStates() {
+  const currentRows = getCountRows();
+  const currentColumns = getCountColumns();
+
   if (currentRows <= MIN_COUNT) {
     removeRowBtn.disabled = true;
   } else {
